@@ -1,0 +1,117 @@
+
+name: AvendCrest Backend CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+  pull_request:
+    branches:
+      - main
+      - dev
+
+env:
+  RENDER_CLI_VERSION: "v2.22.0"
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Get repository code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Install dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # Run lint when configured
+      # - name: Run Lint
+      #   run: npm run lint
+
+      # Run tests when configured
+      # - name: Run Tests
+      #   run: npm test
+
+      # Install Render CLI (main branch pushes only)
+      - name: Install Render CLI
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          set -euo pipefail
+
+          version="${RENDER_CLI_VERSION#v}"
+
+          curl -sSfL \
+            "https://github.com/render-oss/cli/releases/download/${RENDER_CLI_VERSION}/cli_${version}_linux_amd64.zip" \
+            -o /tmp/render.zip
+
+          unzip -q /tmp/render.zip -d /tmp/render
+
+          sudo mv "/tmp/render/cli_${RENDER_CLI_VERSION}" /usr/local/bin/render
+
+          render --version
+
+      # Deploy to Render
+      - name: Deploy to Render
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$RENDER_API_KEY" ]; then
+            echo "RENDER_API_KEY is not set"
+            exit 1
+          fi
+
+          if [ -z "$RENDER_SERVICE_ID" ]; then
+            echo "RENDER_SERVICE_ID is not set"
+            exit 1
+          fi
+
+          echo "Deploying commit $GITHUB_SHA to Render..."
+
+          render deploys create "$RENDER_SERVICE_ID" \
+            --commit "$GITHUB_SHA" \
+            --wait \
+            --confirm
+
+      # Verify deployed API
+      - name: Verify Production Health
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          HEALTH_URL: ${{ secrets.RENDER_HEALTH_URL }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$HEALTH_URL" ]; then
+            echo "RENDER_HEALTH_URL is not set"
+            exit 1
+          fi
+
+          echo "Checking AvendCrest production API..."
+
+          for attempt in {1..12}; do
+            if curl --fail --silent --show-error "$HEALTH_URL"; then
+              echo ""
+              echo "AvendCrest production health check passed!"
+              exit 0
+            fi
+
+            echo "Attempt $attempt failed. Retrying in 10 seconds..."
+            sleep 10
+          done
+
+          echo "Production health check failed."
+          exit 1

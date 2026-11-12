@@ -1,14 +1,12 @@
 import express from "express";
 import cors from 'cors'
 
-import fs from "fs"
-
 const app = express();
 
 app.use(
     cors({
         origin: [
-            "http://localhost:5174/",
+            "http://localhost:5174",
             "https://avendcrest.com",
             "https://www.avendcrest.com",
         ],
@@ -26,5 +24,12 @@ app.use(
 );
 
 // app.use(cookieParser());
+
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'AvendCrest API is healthy'
+  });
+});
 
 export default app;
