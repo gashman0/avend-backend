@@ -1,6 +1,7 @@
 import express from "express";
 import cors from 'cors'
 import authRouter from "./routes/user/auth-routes.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -24,7 +25,7 @@ app.use(
     }),
 );
 
-// app.use(cookieParser());
+app.use(cookieParser());
 
 app.get('/health', (req, res) => {
   res.status(200).json({
