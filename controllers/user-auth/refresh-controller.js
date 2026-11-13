@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { cookieOptions } from '../../config/cookie-config.js';
 
 export const refresh = (req, res) => {
-    const refreshToken = req.cookie.refreshToken
+    const refreshToken = req.cookies.refreshToken
 
     if(!refreshToken) {
         return res.status(401).json({
