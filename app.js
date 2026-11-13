@@ -1,5 +1,6 @@
 import express from "express";
 import cors from 'cors'
+import authRouter from "./routes/user/auth-routes.js";
 
 const app = express();
 
@@ -31,5 +32,7 @@ app.get('/health', (req, res) => {
     message: 'AvendCrest API is healthy'
   });
 });
+
+app.use('/', authRouter);
 
 export default app;
