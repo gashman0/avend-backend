@@ -15,7 +15,7 @@ authRouter.post('/refresh', refresh);
 authRouter.post('/logout', logout);
 
 
-authRouter.get('/me',protectUser, getMe)
+authRouter.get('/me', protectUser, getMe)
 
 
 
