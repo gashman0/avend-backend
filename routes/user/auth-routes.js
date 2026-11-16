@@ -9,6 +9,7 @@ import { getDashboardSummary } from "../../controllers/user/dashboard-summary-co
 import { getWallet } from "../../controllers/user/wallet-controller.js";
 import { getInvestmentPlans } from "../../controllers/user/investment-plan-controller.js";
 import { getUserInvestments } from "../../controllers/user/investment-controller.js";
+import { getUserTransactions } from "../../controllers/user/transaction-controller.js";
 
 
 const authRouter = express.Router();
@@ -24,6 +25,7 @@ authRouter.get('/dashboard', protectUser, getDashboardSummary);
 authRouter.get('/wallet', protectUser, getWallet);
 authRouter.get('/investment-plans', protectUser, getInvestmentPlans);
 authRouter.get('/investments', protectUser, getUserInvestments);
+authRouter.get('/transactions', protectUser, getUserTransactions);
 
 
 
