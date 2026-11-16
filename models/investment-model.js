@@ -10,7 +10,7 @@ const investmentSchema = new mongoose.Schema(
       index: true,
     },
 
-    // Reference to the investment plan used
+    // Investment plan selected by the user
     plan: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "InvestmentPlan",
@@ -25,38 +25,42 @@ const investmentSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // Cryptocurrency used for the investment
     asset: {
       type: String,
       required: true,
       enum: ["BTC", "ETH", "USDT", "BNB", "SOL"],
     },
 
-    // Principal invested, in the selected cryptocurrency
+    // Amount invested in cryptocurrency
     amount: {
       type: Number,
       required: true,
       min: 0,
     },
 
-    // USD equivalent when the investment was created
+    // USD value of the principal at investment creation
     amountUSD: {
       type: Number,
       required: true,
       min: 0,
     },
 
+    // Daily ROI percentage captured when investment is created
     roiRate: {
       type: Number,
       required: true,
       min: 0,
     },
 
+    // Cumulative ROI credited by this investment, in USD
     roiEarned: {
       type: Number,
       default: 0,
       min: 0,
     },
 
+    // Investment duration captured from the selected plan
     durationDays: {
       type: Number,
       required: true,
@@ -85,6 +89,10 @@ const investmentSchema = new mongoose.Schema(
   }
 );
 
+// Efficiently retrieve a user's investments.
+investmentSchema.index({ user: 1, createdAt: -1 });
+
+// Efficiently retrieve active or completed investments.
 investmentSchema.index({ user: 1, status: 1 });
 
 const Investment = mongoose.model("Investment", investmentSchema);

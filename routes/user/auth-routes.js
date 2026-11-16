@@ -7,6 +7,8 @@ import { logout } from "../../controllers/user-auth/logout-controller.js";
 import { getMe } from "../../controllers/user/me.js";
 import { getDashboardSummary } from "../../controllers/user/dashboard-summary-controller.js";
 import { getWallet } from "../../controllers/user/wallet-controller.js";
+import { getInvestmentPlans } from "../../controllers/user/investment-plan-controller.js";
+import { getUserInvestments } from "../../controllers/user/investment-controller.js";
 
 
 const authRouter = express.Router();
@@ -20,6 +22,8 @@ authRouter.post('/logout', logout);
 authRouter.get('/me', protectUser, getMe);
 authRouter.get('/dashboard', protectUser, getDashboardSummary);
 authRouter.get('/wallet', protectUser, getWallet);
+authRouter.get('/investment-plans', protectUser, getInvestmentPlans);
+authRouter.get('/investments', protectUser, getUserInvestments);
 
 
 
