@@ -13,6 +13,7 @@ app.use(
             "http://localhost:5175",
             "https://avendcrest.com",
             "https://www.avendcrest.com",
+            "https://admin.avendcrest.com",
         ],
         credentials: true,
     }),
