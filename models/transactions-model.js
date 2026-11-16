@@ -25,6 +25,7 @@ const transactionSchema = new mongoose.Schema(
         "withdrawal",
         "investment",
         "roi",
+        "principal_return",
         "referral_reward",
       ],
     },
